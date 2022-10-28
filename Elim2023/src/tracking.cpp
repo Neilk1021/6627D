@@ -15,10 +15,10 @@ int task_tracking(){
   double deltaR;
   double deltaD;
   //6.4075
-  float r = 12.7;
+  float r = 10.45 ;
 
   for(int i = 0; i < 2 ; i++){  
-    pastVals.push_front({(double) L.get_value(), (double) R.get_value()});
+    pastVals.push_front({(double) RightDriveMotor1.get_position(), (double) LeftDriveMotor1.get_position()});
   }
 
   lastVals = {(double) L.get_value(), (double) R.get_value()};

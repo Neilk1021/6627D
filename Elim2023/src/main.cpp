@@ -158,39 +158,39 @@ void WPProgress(){
 }
 
 void autonomous(){
-    SwitcherFunc(Auton);
-  DriveToPoint(2, 1, info.direc);
-  turnDeg(-90, 1, 2100);
-  DriveToPoint(0.4, 1.5, info.direc);
-    SwitchIntake();
-  pros::delay(350);
-  SwitchIntake();
-  DriveToPoint(-0.4, 2, info.direc);
-  turnDeg(-99, 1.4, 1650);
-    pros::delay(150);
-  switchPiston();
-  pros::delay(550);
-  switchPiston();
-    pros::delay(200);
-  SwitcherFunc(Auton);
-  turnDeg(128, 0.8, 3250);
-  SwitchIntakeBackSlow();
-  pros::delay(100);
-  DriveToPoint(6.85, .62, info.direc, 3300);
-    pros::delay(200);
-      SwitcherFunc(AutonSlow);
-          pros::delay(100);
-  turnDeg(210.5, 0.55, 4700);
-    DriveToPoint(-0.2, 1.6, info.direc);
-      pros::delay(850);
-  switchPiston();
-  SwitchIntake();
-  pros::delay(600);
-  switchPiston();
-    pros::delay(600);
-  switchPiston();
-    SwitcherFunc(AutonSlow);
-  
+  //   SwitcherFunc(Auton);
+  // DriveToPoint(2, 1, info.direc);
+  // turnDeg(-90, 1, 2100);
+  // DriveToPoint(0.4, 1.5, info.direc);
+  //   SwitchIntake();
+  // pros::delay(350);
+  // SwitchIntake();
+  // DriveToPoint(-0.4, 2, info.direc);
+  // turnDeg(-99, 1.4, 1650);
+  //   pros::delay(150);
+  // switchPiston();
+  // pros::delay(550);
+  // switchPiston();
+  //   pros::delay(200);
+  // SwitcherFunc(Auton);
+  // turnDeg(128, 0.8, 3250);
+  // SwitchIntakeBackSlow();
+  // pros::delay(100);
+  // DriveToPoint(6.85, .62, info.direc, 3300);
+  //   pros::delay(200);
+  //     SwitcherFunc(AutonSlow);
+  //         pros::delay(100);
+  // turnDeg(210.5, 0.55, 4700);
+  //   DriveToPoint(-0.2, 1.6, info.direc);
+  //     pros::delay(850);
+  // switchPiston();
+  // SwitchIntake();
+  // pros::delay(600);
+  // switchPiston();
+  //   pros::delay(600);
+  // switchPiston();
+  //   SwitcherFunc(AutonSlow);
+  turnDeg(90, 1);
 } 
 
 void ArcadeTwoStick()
