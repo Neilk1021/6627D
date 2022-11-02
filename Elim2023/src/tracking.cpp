@@ -1,4 +1,5 @@
 #include "consts.h"
+#include "main.h"
 #include <cmath>
 #include <deque>
 using namespace std;
@@ -51,6 +52,7 @@ int task_tracking(){
         info.direc = info.resetVal;
         info.resetDirecc = false;
       }
+
       printf("%*.*f\n", 5, 4, info.direc);
     
       delay(5);

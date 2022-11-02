@@ -158,41 +158,43 @@ void WPProgress(){
 }
 
 void autonomous(){
-    SwitcherFunc(Auton);
+  //Turns on flywheel and drives then turns 90 degrees
+  SwitcherFunc(Auton);
   DriveToPoint(2, 1, info.direc);
   pros::delay(50);
   turnDeg(-90, 1, 1500);
+  //drives into and backs out of roller
   DriveToPoint(0.375, 1.5, info.direc);
-    SwitchIntake();
+  SwitchIntake();
   pros::delay(350);
   SwitchIntake();
   DriveToPoint(-0.425, 2, info.direc);
   turnDeg(-102.1, 1, 1500);
-    pros::delay(150);
+  pros::delay(150);
   switchPiston();
   pros::delay(800);
   switchPiston();
-    pros::delay(200);
+  pros::delay(200);
   SwitcherFunc(Auton);
   turnDeg(137.5, 0.8, 1900);
   SwitchIntakeBackSlow();
   pros::delay(100);
   DriveToPoint(6.4, .62, info.direc, 3300);
-    pros::delay(200);
-      SwitcherFunc(AutonSlow);
-          pros::delay(100);
-          info.resetDirecc = true;
+  pros::delay(200);
+  SwitcherFunc(AutonSlow);
+  pros::delay(100);
+  info.resetDirecc = true;
   pros::delay(5);
   turnDeg(85.25, 1, 1550);
-    DriveToPoint(-0.2, 1.6, info.direc);
-      pros::delay(1400);
+  DriveToPoint(-0.2, 1.6, info.direc);
+  pros::delay(1400);
   switchPiston();
   SwitchIntake();
   pros::delay(600);
   switchPiston();
-    pros::delay(600);
+  pros::delay(600);
   switchPiston();
-    SwitcherFunc(AutonSlow);
+  SwitcherFunc(AutonSlow);
   
 } 
 

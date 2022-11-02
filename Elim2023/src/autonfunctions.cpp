@@ -2,55 +2,6 @@
 #include <atomic>
 #include <cmath>
 
-struct vector2{
-  public:
-    double X;
-    double Y;
-    vector2(double x = 0, double y = 0){
-      X = x;
-      Y = y;
-    }
-};
-
-class Line{
-  public:
-    vector2 startPos;
-    vector2 endPos; 
-
-    Line(double startingX = 0, double startingY = 0, double EndingX= 1, double EndingY = 1){
-      startPos = vector2(startingX, startingY);
-      endPos = vector2(EndingX, EndingY);
-    }
-    Line(vector2 startPos, vector2 endPos){
-      startPos = startPos;
-      endPos = endPos;
-    }
-
-  void lerp(float pctDone, double& x, double& y){
-    x = (endPos.X - startPos.X) * pctDone + startPos.X; 
-    y = (endPos.Y - startPos.Y) * pctDone + +startPos.Y;
-  }
-
-  double distance(){
-    double x = (endPos.X - startPos.X);
-    double y = (endPos.Y - startPos.Y);
-    return std::sqrt(x*x + y*y);
-  }
-};
-
-class BezierCurve{
-  Line AdjustLineStart;
-  Line AdjustLineEnd;
-  Line BodyLine;
-
-  BezierCurve(vector2 PathStart, vector2 AdjustPointStart, vector2 AdjustPointEnd, vector2 PathEnd){
-    AdjustLineStart = Line(PathStart, AdjustPointStart);
-    BodyLine = Line(AdjustPointStart, AdjustPointEnd);
-    AdjustLineEnd = Line(AdjustPointEnd, PathEnd);
-  }
-
-};
-
 void DriveFor(double dis, double spd, double head, bool slowOn) {
   // negative spd = drive backwards
   double encTicks = dis;
@@ -135,11 +86,7 @@ void DriveTo(double dis, double spd, void DistanceFunc(), float distanceToFireFu
     derivative = deltaO - prevDeltaO;
     prevDeltaO = deltaO;
 
-    //printf("%*.*f\n", 5, 4, deltaO);
-    // "Proportional" but scuffed
     motorScale = (deltaO * Kp) + (Integral* -Ki) + (derivative*Kd);
-    //motorScale = ( motorScale >= 1 ? 1 : motorScale );
-    //clamp(motorScale, .25, 1);     } 
     if(hasFunc && !Fired && std::abs(deltaO) < distanceToFireFunc*19) {
       DistanceFunc();
       Fired = true;
@@ -221,7 +168,8 @@ void DriveToPoint(double dis, double spd, double Heading, int minClamp, bool has
     }
     clamp(motorScale, minClamp, 10000000);
 
-    if(std::abs(deltaO) < 1.5){
+
+    if(std::abs(deltaO) < 0.75 || derivative == 0){
       motorScale = 0;
       targetCount++;
     }else targetCount =0;
@@ -231,8 +179,8 @@ void DriveToPoint(double dis, double spd, double Heading, int minClamp, bool has
 
     LeftDriveMotor1.move_voltage(-spd*motorScale*LeftScale*signOf(deltaO));
     LeftDriveMotor2.move_voltage(-spd*motorScale*LeftScale*signOf(deltaO));
-    pros::delay(5);
-  }while(targetCount < 8);
+    pros::delay(10);
+  }while(targetCount < 7);
 
   RightDriveMotor1.brake();
   RightDriveMotor2.brake();
@@ -275,8 +223,8 @@ void turnDeg(double degrees, double spd, int minClamp){
   while(targetCount < 10){
     tempAngle = info.direc;
     deltaO = target + info.direc;
-    Integral = Integral + deltaO*0.05;
-    if(std::abs(deltaO) < 1){
+    Integral = Integral + deltaO*0.10;
+    if(std::abs(deltaO) < 1 || derivative == 0){
       Integral = 0;
       targetCount++;
     }
@@ -302,7 +250,7 @@ void turnDeg(double degrees, double spd, int minClamp){
     LeftDriveMotor1.move_voltage(spd*motorScale);
     LeftDriveMotor2.move_voltage(spd*motorScale);
 
-    delay(5);
+    delay(10);
   }
 
   RightDriveMotor1.brake();

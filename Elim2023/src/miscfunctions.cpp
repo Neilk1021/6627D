@@ -5,11 +5,11 @@ int signOf(double x) {
 }
 
 void reduceDirec(double& direc){
-  while(direc >= 360){
+  while(direc >= 180){
     direc -= 360;
   }
 
-  while(direc < 0){
+  while(direc < -180){
     direc += 360;
   }
 }
