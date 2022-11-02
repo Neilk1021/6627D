@@ -255,13 +255,12 @@ void turnDeg(double degrees, double spd, int minClamp){
   // double Ki = 0.000001;
   // double Kd = 0.35;
   
-  double Kp = 100;
-  double Ki = 4;
-  double Kd = 10;
+  double Kp = 215;
+  double Ki = -5;
+  double Kd = -75;
 
 //0.001
 //0.3
-  float xval = 0;
   double Integral;
   double derivative;
   double prevDeltaO;
@@ -277,7 +276,7 @@ void turnDeg(double degrees, double spd, int minClamp){
     tempAngle = info.direc;
     deltaO = target + info.direc;
     Integral = Integral + deltaO*0.05;
-    if(std::abs(deltaO) < 0.9){
+    if(std::abs(deltaO) < 1){
       Integral = 0;
       targetCount++;
     }
@@ -287,23 +286,21 @@ void turnDeg(double degrees, double spd, int minClamp){
 
     if(Integral > 6000)
       Integral = 6000;
+    else if (Integral < -6000) Integral = -6000;
 
     derivative = deltaO - prevDeltaO;
     prevDeltaO = deltaO;
 
     motorScale = (deltaO * Kp) + (Integral * Ki) + (derivative*Kd);
+    motorScale += minClamp * signOf(motorScale);
     //motorScale = ( motorScale >= 1 ? 1 : motorScale );
-    motorScale = std::abs(motorScale);
-    if(std::abs(deltaO) > 0.9)clamp(motorScale, minClamp, 120000);
     //printf("%*.*f\n", 5, 4, deltaO);
     
-    RightDriveMotor1.move_voltage(spd*motorScale*signOf(deltaO));
-    RightDriveMotor2.move_voltage(spd*motorScale*signOf(deltaO));
+    RightDriveMotor1.move_voltage(spd*motorScale);
+    RightDriveMotor2.move_voltage(spd*motorScale);
 
-    LeftDriveMotor1.move_voltage(spd*motorScale*signOf(deltaO));
-    LeftDriveMotor2.move_voltage(spd*motorScale*signOf(deltaO));
-
-    xval+=1;    
+    LeftDriveMotor1.move_voltage(spd*motorScale);
+    LeftDriveMotor2.move_voltage(spd*motorScale);
 
     delay(5);
   }

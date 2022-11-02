@@ -79,7 +79,7 @@ void reduceDirec(double&);
 void toShortestAngle(double&);
 void toGearRotation(int&);
 void turnTo(double, double);
-void turnDeg(double, double, int = 1900);
+void turnDeg(double, double, int = 1400);
 //int eFunc();
 int flywheelWheelPID();
 void clamp(double&, double, double);

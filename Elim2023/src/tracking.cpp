@@ -18,7 +18,7 @@ int task_tracking(){
   float r = 10.45 ;
 
   for(int i = 0; i < 2 ; i++){  
-    pastVals.push_front({(double) RightDriveMotor1.get_position(), (double) LeftDriveMotor1.get_position()});
+    pastVals.push_front({(double) R.get_value(), (double) L.get_value()});
   }
 
   lastVals = {(double) L.get_value(), (double) R.get_value()};
@@ -43,7 +43,7 @@ int task_tracking(){
       deltaR = (CurrentVals.encRVal - lastVals.encRVal)* 2.75 * 3.1415926 / 360;
 
       deltaO = -(deltaR - deltaL)/r;
-      deltaD = -(deltaL + deltaR) / 2.0;
+      deltaD = (deltaL + deltaR) / 2.0;
       lastVals = CurrentVals;
       info.direc += deltaO * (180/3.1415926);
       info.driveticks += deltaD;
