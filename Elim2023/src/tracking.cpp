@@ -16,7 +16,7 @@ int task_tracking(){
   double deltaR;
   double deltaD;
   //6.4075
-  float r = 10.45 ;
+  float r = 10.65;
 
   for(int i = 0; i < 2 ; i++){  
     pastVals.push_front({(double) R.get_value(), (double) L.get_value()});
@@ -52,10 +52,9 @@ int task_tracking(){
         info.direc = info.resetVal;
         info.resetDirecc = false;
       }
-
       printf("%*.*f\n", 5, 4, info.direc);
     
-      delay(5);
+      delay(10);
   }
 }
 

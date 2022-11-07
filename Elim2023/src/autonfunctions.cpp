@@ -119,7 +119,7 @@ void DriveToPoint(double dis, double spd, double Heading, int minClamp, bool has
   double absDif;
   double motorScale;
   double deltaO;
-  int targetCount = 0;
+  double targetCount = 0;
 
   double Kp = 400;
   double Ki = 1;
@@ -169,10 +169,12 @@ void DriveToPoint(double dis, double spd, double Heading, int minClamp, bool has
     clamp(motorScale, minClamp, 10000000);
 
 
-    if(std::abs(deltaO) < 0.75 || derivative == 0){
+    if(std::abs(deltaO) < 0.75 ){
       motorScale = 0;
       targetCount++;
-    }else targetCount =0;
+    }
+    else if (RightDriveMotor1.get_actual_velocity() == 0) targetCount += .66;
+    else targetCount =0;
 
     RightDriveMotor1.move_voltage(spd*motorScale*RightScale*signOf(deltaO));
     RightDriveMotor2.move_voltage(spd*motorScale*RightScale*signOf(deltaO));
@@ -180,7 +182,7 @@ void DriveToPoint(double dis, double spd, double Heading, int minClamp, bool has
     LeftDriveMotor1.move_voltage(-spd*motorScale*LeftScale*signOf(deltaO));
     LeftDriveMotor2.move_voltage(-spd*motorScale*LeftScale*signOf(deltaO));
     pros::delay(10);
-  }while(targetCount < 7);
+  }while(targetCount < 10);
 
   RightDriveMotor1.brake();
   RightDriveMotor2.brake();
@@ -197,15 +199,15 @@ void turnDeg(double degrees, double spd, int minClamp){
   double currentAmount; //stacking total of amount that has changed
   double motorScale;
   double deltaO;
-  int targetCount = 0;
+  double targetCount = 0;
 
   // double Kp = 1.60/2;
   // double Ki = 0.000001;
   // double Kd = 0.35;
   
-  double Kp = 215;
-  double Ki = -5;
-  double Kd = -75;
+  double Kp = 350 *0.8;
+  double Ki = 0;
+  double Kd = 25;
 
 //0.001
 //0.3
@@ -220,17 +222,11 @@ void turnDeg(double degrees, double spd, int minClamp){
   reduceDirec(target);
   toShortestAngle(target);
 
-  while(targetCount < 10){
+  while(targetCount < 8){
+    
     tempAngle = info.direc;
     deltaO = target + info.direc;
     Integral = Integral + deltaO*0.10;
-    if(std::abs(deltaO) < 1 || derivative == 0){
-      Integral = 0;
-      targetCount++;
-    }
-    else{
-      targetCount = 0;
-    }
 
     if(Integral > 6000)
       Integral = 6000;
@@ -240,10 +236,21 @@ void turnDeg(double degrees, double spd, int minClamp){
     prevDeltaO = deltaO;
 
     motorScale = (deltaO * Kp) + (Integral * Ki) + (derivative*Kd);
-    motorScale += minClamp * signOf(motorScale);
+    //motorScale += minClamp * signOf(motorScale);
     //motorScale = ( motorScale >= 1 ? 1 : motorScale );
     //printf("%*.*f\n", 5, 4, deltaO);
-    
+    motorScale < 0 ? 
+    clamp(motorScale, -INFINITY, -minClamp) :
+    clamp(motorScale, minClamp, INFINITY);
+
+    if(std::abs(deltaO) < 0.4){
+      motorScale = 0;
+      targetCount++;
+    }
+    else if (std::abs(RightDriveMotor1.get_actual_velocity()) < 0.1) targetCount += .66;
+    else targetCount =0;
+
+
     RightDriveMotor1.move_voltage(spd*motorScale);
     RightDriveMotor2.move_voltage(spd*motorScale);
 

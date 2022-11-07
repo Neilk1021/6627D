@@ -20,7 +20,7 @@ void UpdateSpeed(){
       info.desiredFlywheelSpeed = AutonSpeed;
       break;
     case AutonSlow:
-      info.desiredFlywheelSpeed = 146;
+      info.desiredFlywheelSpeed = 152;
       break;
     case AutonFirst: 
       //4
