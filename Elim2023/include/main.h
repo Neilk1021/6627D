@@ -78,6 +78,7 @@ int signOf(double);
 void reduceDirec(double&);
 void toShortestAngle(double&);
 void toGearRotation(int&);
+
 void turnTo(double, double);
 void turnDeg(double, double, int = 1400);
 //int eFunc();
@@ -100,7 +101,6 @@ void SwitchIntake();
 void SwitchIntakeBack();
 void SwitchIntakeBackSlow();
 
-
 void autonomous(void);
 void initialize(void);
 void disabled(void);
@@ -111,10 +111,12 @@ void opcontrol();
 #endif
 
 #ifdef __cplusplus
-/**
- * You can add C++-only headers here
- */
-//#include <iostream>
+
+template <typename T>
+T D2R(T deg);
+template <typename T>
+T R2D(T rad);
+
 #endif
 
 #endif  // _PROS_MAIN_H_

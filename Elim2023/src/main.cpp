@@ -1,5 +1,5 @@
 #include "main.h"
-#include "consts.h"
+#include "consts.hpp"
 #include <cmath>
 
 bool RunningPiston = false;
@@ -223,17 +223,12 @@ void ArcadeTwoStick()
   *ptrA3 = Con.get_analog(ANALOG_LEFT_Y)*2;
 
     if(std::abs(*ptrA3) > 2 || std::abs(*ptrA1) > 2) {
-      LeftDriveMotor1.move_velocity(-(AxisThree + AxisOne));
-      LeftDriveMotor2.move_velocity(-(AxisThree + AxisOne));
-      RightDriveMotor1.move_velocity((AxisThree - AxisOne));
-      RightDriveMotor2.move_velocity((AxisThree - AxisOne));
+      LeftDrive.move_velocity(-(AxisThree + AxisOne));
+      RightDrive.move_velocity((AxisThree - AxisOne));
 
     }else{
-        RightDriveMotor1.brake();
-        RightDriveMotor2.brake();
-
-        LeftDriveMotor1.brake();
-        LeftDriveMotor2.brake();
+        RightDrive.brake();
+        LeftDrive.brake();
     }
     pros::delay(10);
 

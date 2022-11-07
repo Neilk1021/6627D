@@ -1,5 +1,5 @@
 #include "main.h"
-#include "consts.h"
+#include "consts.hpp"
 
 bool SlowIntake = false;
 float CurrentIntakeSpeed;

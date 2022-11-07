@@ -1,5 +1,6 @@
-#include "../include/consts.h"
+#include "../include/consts.hpp"
 #include "../include/main.h"
+#include "pros/adi.h"
 #include <string>
 using namespace pros;
 
@@ -31,21 +32,17 @@ using namespace pros;
 // }
 
 void proscodeInit(){   
-    printf("e");
     Indexer.set_value(true);
     R.reset();
     L.reset();
-    RightDriveMotor1.set_brake_mode(E_MOTOR_BRAKE_BRAKE);
-    RightDriveMotor2.set_brake_mode(E_MOTOR_BRAKE_BRAKE);
-    LeftDriveMotor1.set_brake_mode(E_MOTOR_BRAKE_BRAKE);
-    LeftDriveMotor2.set_brake_mode(E_MOTOR_BRAKE_BRAKE);
+    RightDrive.set_brake_modes(E_MOTOR_BRAKE_BRAKE);
+    LeftDrive.set_brake_modes(E_MOTOR_BRAKE_BRAKE);
     info.driveticks = 0;
     Cat.set_value(false);
     info.direc = 0;
     info.resetVal = 0;
     info.desiredFlywheelSpeed = 0;
     Task Run(Intake);
-    //Task runE(eFunc);
     Task runFlyWheel(flywheelWheelPID);
     Task runTracking(task_tracking);
 }

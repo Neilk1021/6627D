@@ -1,7 +1,11 @@
 #include "datastructs.h"
 #include "main.h"
+#include "pros/adi.h"
 #include "pros/adi.hpp"
+#include "pros/motors.hpp"
 using namespace pros;
+using namespace pros::c;
+using namespace std; 
 
 #ifndef DATA_H
 #define DATA_H
@@ -21,15 +25,13 @@ extern const double AutonSpeed;
 extern const double IntakeSpeed;
 extern const double IntakeSpeedSlowed;
 
-extern pros::Motor LeftDriveMotor1;
-extern pros::Motor LeftDriveMotor2;
 
-extern pros::Motor RightDriveMotor1;
-extern pros::ADIEncoder L;
+//extern pros::Motor RightDriveMotor1;
+extern ADIEncoder L;
 extern pros::Motor Flywheel;
 extern pros::Motor Flywheel2;
-extern pros::ADIEncoder R;
-extern pros::Motor RightDriveMotor2;
+extern ADIEncoder R;
+//extern pros::Motor RightDriveMotor2;
 extern pros::Motor IntakeM;
 extern pros::Motor IntakeM2;
 extern pros::ADIEncoder FlywheelEnc;
@@ -38,5 +40,12 @@ extern pros::ADIEncoder FlywheelEnc;
 //extern pros::motor_group RightDriveTrain;
 extern pros::ADIDigitalOut Indexer;
 extern pros::ADIDigitalOut Cat;
+extern Motor_Group RightDrive;
+extern Motor_Group LeftDrive;
 
 #endif
+
+#define getDR() (double)R.get_value()
+#define getDL() (double)L.get_value()
+#define PI 3.14159265358979323846
+#define ToRad() 180/PI

@@ -1,9 +1,8 @@
-#include "consts.h"
+#include "consts.hpp"
 #include "main.h"
 #include <cmath>
 #include <deque>
 using namespace std;
-
 
 int task_tracking(){
   //std::deque<EncoderData> pastVals;
@@ -19,16 +18,16 @@ int task_tracking(){
   float r = 10.65;
 
   for(int i = 0; i < 2 ; i++){  
-    pastVals.push_front({(double) R.get_value(), (double) L.get_value()});
+    pastVals.push_front({getDR(), getDL()});
   }
 
-  lastVals = {(double) L.get_value(), (double) R.get_value()};
+  lastVals = {getDL(), getDR()};
 
   while(true){
     CurrentVals.encLVal = 0;
     CurrentVals.encRVal = 0;
 
-    pastVals.push_front( {(double) L.get_value(), (double) R.get_value()});
+    pastVals.push_front( {getDL(), getDR()});
 
     pastVals.pop_back();
 
@@ -40,13 +39,13 @@ int task_tracking(){
     CurrentVals.encLVal /= 2;
     CurrentVals.encRVal /= 2;
 
-      deltaL = -(CurrentVals.encLVal - lastVals.encLVal)* 2.75 * 3.1415926 / 360;
-      deltaR = (CurrentVals.encRVal - lastVals.encRVal)* 2.75 * 3.1415926 / 360;
+      deltaL = -(CurrentVals.encLVal - lastVals.encLVal)* 2.75 * PI / 360;
+      deltaR = (CurrentVals.encRVal - lastVals.encRVal)* 2.75 * PI / 360;
 
       deltaO = -(deltaR - deltaL)/r;
       deltaD = (deltaL + deltaR) / 2.0;
       lastVals = CurrentVals;
-      info.direc += deltaO * (180/3.1415926);
+      info.direc += R2D(deltaO);
       info.driveticks += deltaD;
       if(info.resetDirecc){
         info.direc = info.resetVal;
@@ -67,7 +66,7 @@ int OdomTrack(){
   float lastDistance = 0; 
   float xval = 0;
   while(1){
-    float s1 = R.get_value() * 2.75 * 3.1415926 / 360;
+    float s1 = getDR() * 2.75 * 3.1415926 / 360;
     float s2 = L.get_value() * 2.75 * 3.1415926 / 360;
 
     float theta = (s1+s2)/r;

@@ -1,4 +1,4 @@
-#include "consts.h"
+#include "consts.hpp"
 #include <atomic>
 #include <cmath>
 
@@ -33,11 +33,9 @@ void DriveFor(double dis, double spd, double head, bool slowOn) {
       leftScale = 1;
     //}
 
-    RightDriveMotor1.move_velocity(spd*motorScale*rightScale*signOf(dis));
-    RightDriveMotor2.move_velocity(spd*motorScale*rightScale*signOf(dis));
+    RightDrive.move_velocity(spd*motorScale*rightScale*signOf(dis));
 
-    LeftDriveMotor1.move_velocity(-spd*motorScale*leftScale*signOf(dis));
-    LeftDriveMotor2.move_velocity(-spd*motorScale*leftScale*signOf(dis));
+    LeftDrive.move_velocity(-spd*motorScale*leftScale*signOf(dis));
 
     //RightDriveTrain.spin(directionType::rev, spd*motorScale*rightScale, pct);
     //LeftDriveTrain.spin(directionType::fwd, spd*motorScale*leftScale, pct);
@@ -46,11 +44,9 @@ void DriveFor(double dis, double spd, double head, bool slowOn) {
 
   } while (absDif < std::abs(encTicks));
 
-  RightDriveMotor1.brake();
-  RightDriveMotor2.brake();
+  RightDrive.brake();
 
-  LeftDriveMotor1.brake();
-  LeftDriveMotor2.brake();
+  LeftDrive.brake();
 
 
  // RightDriveTrain.brake(brakeType::brake);
@@ -97,19 +93,15 @@ void DriveTo(double dis, double spd, void DistanceFunc(), float distanceToFireFu
       targetCount++;
     }else targetCount =0;
 
-    RightDriveMotor1.move_velocity(spd*motorScale);
-    RightDriveMotor2.move_velocity(spd*motorScale);
+    RightDrive.move_velocity(spd*motorScale);
 
-    LeftDriveMotor1.move_velocity(-spd*motorScale);
-    LeftDriveMotor2.move_velocity(-spd*motorScale);
+    LeftDrive.move_velocity(-spd*motorScale);
     pros::delay(5);
   }while(targetCount < 8);
 
-  RightDriveMotor1.brake();
-  RightDriveMotor2.brake();
+  RightDrive.brake();
 
-  LeftDriveMotor1.brake();
-  LeftDriveMotor2.brake();
+  LeftDrive.brake();
 
 }
 
@@ -173,22 +165,18 @@ void DriveToPoint(double dis, double spd, double Heading, int minClamp, bool has
       motorScale = 0;
       targetCount++;
     }
-    else if (RightDriveMotor1.get_actual_velocity() == 0) targetCount += .66;
+    else if (RightDrive.get_actual_velocities()[0] == 0) targetCount += .66;
     else targetCount =0;
 
-    RightDriveMotor1.move_voltage(spd*motorScale*RightScale*signOf(deltaO));
-    RightDriveMotor2.move_voltage(spd*motorScale*RightScale*signOf(deltaO));
+    RightDrive.move_voltage(spd*motorScale*RightScale*signOf(deltaO));
 
-    LeftDriveMotor1.move_voltage(-spd*motorScale*LeftScale*signOf(deltaO));
-    LeftDriveMotor2.move_voltage(-spd*motorScale*LeftScale*signOf(deltaO));
+    LeftDrive.move_voltage(-spd*motorScale*LeftScale*signOf(deltaO));
     pros::delay(10);
   }while(targetCount < 10);
 
-  RightDriveMotor1.brake();
-  RightDriveMotor2.brake();
+  RightDrive.brake();
 
-  LeftDriveMotor1.brake();
-  LeftDriveMotor2.brake();
+  LeftDrive.brake();
 
 }
 
@@ -201,16 +189,10 @@ void turnDeg(double degrees, double spd, int minClamp){
   double deltaO;
   double targetCount = 0;
 
-  // double Kp = 1.60/2;
-  // double Ki = 0.000001;
-  // double Kd = 0.35;
-  
   double Kp = 350 *0.8;
   double Ki = 0;
   double Kd = 25;
 
-//0.001
-//0.3
   double Integral;
   double derivative;
   double prevDeltaO;
@@ -236,9 +218,6 @@ void turnDeg(double degrees, double spd, int minClamp){
     prevDeltaO = deltaO;
 
     motorScale = (deltaO * Kp) + (Integral * Ki) + (derivative*Kd);
-    //motorScale += minClamp * signOf(motorScale);
-    //motorScale = ( motorScale >= 1 ? 1 : motorScale );
-    //printf("%*.*f\n", 5, 4, deltaO);
     motorScale < 0 ? 
     clamp(motorScale, -INFINITY, -minClamp) :
     clamp(motorScale, minClamp, INFINITY);
@@ -247,23 +226,23 @@ void turnDeg(double degrees, double spd, int minClamp){
       motorScale = 0;
       targetCount++;
     }
-    else if (std::abs(RightDriveMotor1.get_actual_velocity()) < 0.1) targetCount += .66;
+    else if (std::abs(RightDrive.get_actual_velocities()[0]) < 0.1) targetCount += .66;
     else targetCount =0;
 
 
-    RightDriveMotor1.move_voltage(spd*motorScale);
-    RightDriveMotor2.move_voltage(spd*motorScale);
+    RightDrive.move_voltage(spd*motorScale);
+    //RightDrive.move_voltage(spd*motorScale);
 
-    LeftDriveMotor1.move_voltage(spd*motorScale);
-    LeftDriveMotor2.move_voltage(spd*motorScale);
+    LeftDrive.move_voltage(spd*motorScale);
+    //LeftDrive.move_voltage(spd*motorScale);
 
     delay(10);
   }
 
-  RightDriveMotor1.brake();
-  RightDriveMotor2.brake();
+  //RightDriveMotor1.brake();
+  RightDrive.brake();
 
-  LeftDriveMotor1.brake();
-  LeftDriveMotor2.brake();
+  //LeftDriveMotor1.brake();
+  LeftDrive.brake();
 }
 

@@ -1,4 +1,5 @@
-#include "consts.h"
+#include "consts.hpp"
+#include "pros/motors.hpp"
 
 CoreData info;
 
@@ -25,6 +26,8 @@ Motor Flywheel(6, E_MOTOR_GEARSET_18, false);
 Motor Flywheel2(8, E_MOTOR_GEARSET_18, true);
 Motor IntakeM(9 , E_MOTOR_GEARSET_06, true);
 Motor IntakeM2(7 , E_MOTOR_GEARSET_06, false);
+Motor_Group LeftDrive({LeftDriveMotor1, LeftDriveMotor2});
+Motor_Group RightDrive({RightDriveMotor1, RightDriveMotor2});
 
 //motor_group LeftDriveTrain(LeftDriveMotor1, LeftDriveMotor2);
 //motor_group RightDriveTrain(RightDriveMotor1, RightDriveMotor2);
@@ -33,7 +36,7 @@ Motor IntakeM2(7 , E_MOTOR_GEARSET_06, false);
 #define R_TOP_PORT 'C'
 #define R_BOTTOM_PORT 'D'
 
- ADIEncoder L(L_TOP_PORT, L_BOTTOM_PORT); 
+ADIEncoder L(L_TOP_PORT, L_BOTTOM_PORT); 
 ADIEncoder R(R_TOP_PORT, R_BOTTOM_PORT); 
 ADIEncoder FlywheelEnc('E', 'F'); 
 ADIDigitalOut Indexer('G');

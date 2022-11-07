@@ -1,4 +1,4 @@
 #include "main.h"
-#include "consts.h"
+#include "consts.hpp"
 #include <cmath>
 
