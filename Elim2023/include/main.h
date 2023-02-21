@@ -80,7 +80,7 @@ void toShortestAngle(double&);
 void toGearRotation(int&);
 
 void turnTo(double, double);
-void turnDeg(double, double, int = 1400);
+void turnDeg(double, double);
 //int eFunc();
 int flywheelWheelPID();
 void clamp(double&, double, double);
@@ -88,7 +88,7 @@ void switchIntake();
 void SwitchIntakeBack();
 void DriveFor(double, double, double, bool);
 void DriveTo(double, double, void() = nullptr, float = 0, bool = false);
-void DriveToPoint(double, double, double = 0, int = 1800,  bool = false, void() = nullptr, float = 0);
+void DriveToPoint(double, double, double = 0, int = 1700, bool = false ,bool = false, void() = nullptr, float = 0);
 int task_tracking();
 int OdomTrack();
 void Intake();
@@ -111,11 +111,6 @@ void opcontrol();
 #endif
 
 #ifdef __cplusplus
-
-template <typename T>
-T D2R(T deg);
-template <typename T>
-T R2D(T rad);
 
 #endif
 

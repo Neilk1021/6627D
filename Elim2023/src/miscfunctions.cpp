@@ -1,4 +1,5 @@
 #include "consts.hpp"
+#include "main.h"
 
 int signOf(double x) {
   return (x < 0 ? -1: 1);
@@ -26,15 +27,6 @@ void clamp(double& val, double lower, double upper){
   }else if (val < lower) {
     val = lower; 
   }
-}
-template <typename T>
-T R2D(T rad){
-  rad*180/PI;
-}
-
-template <typename T>
-T D2R(T deg){
-  deg*PI/180;
 }
 
 

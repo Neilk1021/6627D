@@ -308,7 +308,8 @@
       }
     },
     "upload_options": {
-      "slot": 1
+      "slot": 1,
+      "description": "DRIVE"
     }
   }
 }

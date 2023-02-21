@@ -1,6 +1,25 @@
 #include "consts.hpp"
 #include <atomic>
 #include <cmath>
+#include <type_traits>
+
+Slew_t::Slew_t(float SlewRate){
+  this->SlewRate=SlewRate; output = 0;
+  prevTime = millis();
+};
+
+//changes flywheel voltage over time rather than immediately to reduce strain and variation
+double Slew_t::update(double in){
+  int dt = millis() - prevTime;
+  if(dt > 1000) dt = 0;
+  prevTime = millis();
+  double maxIncrease = SlewRate * dt;
+  double outputRate = (double)(in - output) / (double)dt;
+  if (fabs(outputRate) < SlewRate) output = in;
+  else if (outputRate > 0) output += maxIncrease;
+  else output -= maxIncrease;
+  return output;
+}
 
 void DriveFor(double dis, double spd, double head, bool slowOn) {
   // negative spd = drive backwards
@@ -104,31 +123,33 @@ void DriveTo(double dis, double spd, void DistanceFunc(), float distanceToFireFu
   LeftDrive.brake();
 
 }
-
-void DriveToPoint(double dis, double spd, double Heading, int minClamp, bool hasFunc, void DistanceFunc(), float distanceToFireFunc) {
+/**
+drives x distance at a certain speed and attempts to maintain a certain heading while driving
+*/
+void DriveToPoint(double dis, double spd, double Heading, int minClamp, bool disableNotMoveCheck ,bool hasFunc, void DistanceFunc(), float distanceToFireFunc) {
   double encTicks = dis* 19;
   double startTicks = info.driveticks;
-  double absDif;
   double motorScale;
   double deltaO;
   double targetCount = 0;
 
-  double Kp = 400;
-  double Ki = 1;
-  double Kd = 50;
+  double Kp = 630;
+  double Ki = 0;
+  double Kd = 11000;
 
   double RightScale;
   double LeftScale;
-  double correctionAmount = .01;
+  double correctionAmount = .05;
 
   double Integral;
   double derivative;
   double prevDeltaO;
-  
+  Slew_t slewL(75);
+  Slew_t slewR(75);
+  //function to run while driving 
   void (*RunFunc)() = DistanceFunc;
   bool Fired = false;
   do{
-    absDif = info.driveticks - startTicks;
     deltaO = info.driveticks - startTicks +encTicks;
     Integral = Integral + deltaO;
 
@@ -137,40 +158,36 @@ void DriveToPoint(double dis, double spd, double Heading, int minClamp, bool has
 
     derivative = deltaO - prevDeltaO;
     prevDeltaO = deltaO;
-
-    //printf("%*.*f\n", 5, 4, deltaO);
-    // "Proportional" but scuffed
+    //pid motor voltage calculation
     motorScale = (deltaO * Kp) + (Integral* -Ki) + (derivative*Kd);
-    //motorScale = ( motorScale >= 1 ? 1 : motorScale );
-    //clamp(motorScale, .25, 1);     } 
     if(hasFunc && !Fired && std::abs(deltaO) < distanceToFireFunc*19) {
       DistanceFunc();
       Fired = true;
     }
-
-    if((info.direc - Heading) > 0.5)  {
-      RightScale = 1 + (info.direc - Heading)*correctionAmount;
-      LeftScale = 1 - (info.direc - Heading)*correctionAmount;
-    }else if ((info.direc - Heading) < -0.5) {
-      RightScale = 1 - (info.direc - Heading)*correctionAmount;
-      LeftScale = 1 + (info.direc - Heading)*correctionAmount;
+    //scales motor power based off of heading of the robot.
+    if(fabs(info.direc - Heading) > 0.05)  {
+      RightScale = 1 + (info.direc - Heading)*correctionAmount*signOf(motorScale);
+      LeftScale = 1 - (info.direc - Heading)*correctionAmount*signOf(motorScale);
     }else {
       RightScale = 1;
       LeftScale = 1;
     }
+
+    int SaveDir = signOf(motorScale);
     clamp(motorScale, minClamp, 10000000);
 
-
-    if(std::abs(deltaO) < 0.75 ){
+    if(std::abs(deltaO) < 0.5 ){
       motorScale = 0;
       targetCount++;
     }
-    else if (RightDrive.get_actual_velocities()[0] == 0) targetCount += .66;
+    else if (RightDrive.get_actual_velocities()[0] == 0 && !disableNotMoveCheck) targetCount += .25;
     else targetCount =0;
 
-    RightDrive.move_voltage(spd*motorScale*RightScale*signOf(deltaO));
+    double pwrR = slewR.update(spd*motorScale*SaveDir*RightScale);
+    double pwrL = slewL.update(spd*motorScale*SaveDir*LeftScale);
 
-    LeftDrive.move_voltage(-spd*motorScale*LeftScale*signOf(deltaO));
+    RightDrive.move_voltage(pwrR);
+    LeftDrive.move_voltage(-pwrL);
     pros::delay(10);
   }while(targetCount < 10);
 
@@ -179,70 +196,68 @@ void DriveToPoint(double dis, double spd, double Heading, int minClamp, bool has
   LeftDrive.brake();
 
 }
-
-void turnDeg(double degrees, double spd, int minClamp){
+/**
+turns a given amount of degrees to turn to the heading specified when the function is run
+*/
+void turnDeg(double degrees, double spd){
   double tempAngle = info.direc;
   double angleRad = degrees;
-  double target; //total amount to change
-  double currentAmount; //stacking total of amount that has changed
+  double target; //total amsount to change
   double motorScale;
   double deltaO;
   double targetCount = 0;
 
-  double Kp = 350 *0.8;
+  double Kp = 925;
   double Ki = 0;
-  double Kd = 25;
+  double Kd = 17000;
 
   double Integral;
   double derivative;
   double prevDeltaO;
-
+  double Error ;
+  //reduces direction of the current heading to within 360 degrees
   reduceDirec(tempAngle); 
-  //target = angleRad - tempAngle;
   target =angleRad; 
-
   reduceDirec(target);
   toShortestAngle(target);
+  //creates a slew object to handle the voltage sent to each motor
+  Slew_t slew;
 
-  while(targetCount < 8){
+  while(targetCount < 6){
     
     tempAngle = info.direc;
     deltaO = target + info.direc;
-    Integral = Integral + deltaO*0.10;
+    Error = std::abs(deltaO);
+    Integral = Integral + (cbrt(Error)*signOf(deltaO)*16);
 
-    if(Integral > 6000)
-      Integral = 6000;
-    else if (Integral < -6000) Integral = -6000;
-
+    if(Integral > 1900)
+      Integral = 1900;
+    else if (Integral < -1900) Integral = -1900;
     derivative = deltaO - prevDeltaO;
     prevDeltaO = deltaO;
-
+    //Combines P I D values to a draft voltage to be sent to the slew object
     motorScale = (deltaO * Kp) + (Integral * Ki) + (derivative*Kd);
-    motorScale < 0 ? 
-    clamp(motorScale, -INFINITY, -minClamp) :
-    clamp(motorScale, minClamp, INFINITY);
-
+    //if the degree is within a certain range the code stops.
     if(std::abs(deltaO) < 0.4){
+      Integral = 0;
       motorScale = 0;
       targetCount++;
     }
-    else if (std::abs(RightDrive.get_actual_velocities()[0]) < 0.1) targetCount += .66;
+    else if (std::abs(RightDrive.get_actual_velocities()[0]) < 0.002) targetCount += .4;
     else targetCount =0;
 
+    //Calcuates power to apply to motors based on current voltage.
+    double pwr = slew.update(spd*motorScale);
 
-    RightDrive.move_voltage(spd*motorScale);
-    //RightDrive.move_voltage(spd*motorScale);
-
-    LeftDrive.move_voltage(spd*motorScale);
-    //LeftDrive.move_voltage(spd*motorScale);
+    RightDrive.move_voltage(pwr);
+    LeftDrive.move_voltage(pwr);
+    //Debug to keep track of PID
+    printf("P: %d I: %d D: %d Error: %f\n", (int)(deltaO*Kp), (int) (Integral * Ki), (int)(derivative*Kd), info.direc);
 
     delay(10);
   }
 
-  //RightDriveMotor1.brake();
   RightDrive.brake();
-
-  //LeftDriveMotor1.brake();
   LeftDrive.brake();
 }
 

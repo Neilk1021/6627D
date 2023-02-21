@@ -1,8 +1,10 @@
 #include "datastructs.h"
 #include "main.h"
+#include "pros/apix.h"
 #include "pros/adi.h"
 #include "pros/adi.hpp"
 #include "pros/motors.hpp"
+#include "pros/serial.hpp"
 using namespace pros;
 using namespace pros::c;
 using namespace std; 
@@ -25,7 +27,6 @@ extern const double AutonSpeed;
 extern const double IntakeSpeed;
 extern const double IntakeSpeedSlowed;
 
-
 //extern pros::Motor RightDriveMotor1;
 extern ADIEncoder L;
 extern pros::Motor Flywheel;
@@ -45,7 +46,18 @@ extern Motor_Group LeftDrive;
 
 #endif
 
+#ifndef CONSTS
+#define CONSTS
+
 #define getDR() (double)R.get_value()
 #define getDL() (double)L.get_value()
 #define PI 3.14159265358979323846
-#define ToRad() 180/PI
+
+struct Slew_t{
+    double SlewRate, output;
+    int prevTime;
+    Slew_t(float SlewRate=105);
+    double update(double in);
+};
+
+#endif

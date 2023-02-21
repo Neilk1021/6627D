@@ -4,6 +4,18 @@
 #include <deque>
 using namespace std;
 
+template <typename T>
+double R2D(T rad){
+  return rad*180/PI;
+}
+
+template <typename T>
+T D2R(T deg){
+  return deg*PI/180;
+}
+/**
+Odometry loop keeps track of heading and distance traveled
+*/
 int task_tracking(){
   //std::deque<EncoderData> pastVals;
   deque<EncoderData> pastVals;
@@ -15,7 +27,7 @@ int task_tracking(){
   double deltaR;
   double deltaD;
   //6.4075
-  float r = 10.65;
+  float r = 11;
 
   for(int i = 0; i < 2 ; i++){  
     pastVals.push_front({getDR(), getDL()});
@@ -51,7 +63,7 @@ int task_tracking(){
         info.direc = info.resetVal;
         info.resetDirecc = false;
       }
-      printf("%*.*f\n", 5, 4, info.direc);
+      //printf("%*.*f\n", 5, 4, info.direc);
     
       delay(10);
   }

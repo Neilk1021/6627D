@@ -11,7 +11,7 @@ const double WHEEL_RAD = 3.25/2;
 //325
 const double FlywheelSpeed = 145;
 const float ANGLE_SCALE_VAL =  49.5 * 1.5;
-const double AutonSpeed =  166;
+const double AutonSpeed =  169;
 const double IntakeSpeed = 420;
 const double IntakeSpeedSlowed = 300;
 
